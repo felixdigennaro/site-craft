@@ -1,0 +1,18 @@
+{
+  "name": "site-craft",
+  "version": "1.0.0",
+  "description": "A design gate that actually runs — 31 rules, static + headless browser pass.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "scaudit": "./scripts/scaudit.mjs" },
+  "scripts": {
+    "test": "node tests/test_all.mjs",
+    "test:live": "node tests/test_all.mjs --live",
+    "gate": "node scripts/scaudit.mjs",
+    "demo": "node scripts/scaudit.mjs examples/before.html && node scripts/scaudit.mjs examples/after.html"
+  },
+  "engines": { "node": ">=18" },
+  "optionalDependencies": {},
+  "devDependencies": { "playwright": "^1.40.0" },
+  "files": ["SKILL.md", "README.md", "LICENSE", "CHANGELOG.md", "scripts/", "references/", "examples/", "tests/"]
+}

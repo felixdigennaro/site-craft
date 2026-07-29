@@ -1,0 +1,89 @@
+
+site-craft audit — 1 file(s)
+────────────────────────────────────────────────────────────
+✗ FAIL   A1    Ambient layers present (≥2)
+         only 0/3 layer families — a flat background is the loudest slop tell
+✗ FAIL   A3    No default flat shadows
+         3 default shadow(s)
+         ↳ examples/before.html:25  box-shadow: 0 4px 6px rgba(0,0,0,0.1)
+         ↳ examples/before.html:31  box-shadow: 0 4px 6px rgba(0,0,0,0.1)
+         ↳ examples/before.html:34  box-shadow: 0 2px 4px rgba(0,0,0,0.1)
+! WARN   A3b   Ambient shadows use negative spread
+         3/3 ambient shadow layer(s) with no negative spread
+         ↳ examples/before.html:25  0 4px 6px rgba(0,0,0,0.1)
+         ↳ examples/before.html:31  0 4px 6px rgba(0,0,0,0.1)
+         ↳ examples/before.html:34  0 2px 4px rgba(0,0,0,0.1)
+✗ FAIL   A4    Glass uses saturate(), not blur alone
+         1/1 blur without saturate — renders as grey plastic
+         ↳ examples/before.html:39  backdrop-filter: blur(10px)
+- SKIP   A6    Halo containers clip horizontally
+         no halos detected
+✗ FAIL   B7    One accent hue family (≤3 chromatic families)
+         5 hue families: #6d28d9 #ec4899 #111827 #10b981 #f59e0b — more than accent + state
+✗ FAIL   B8    Four ink stops in use
+         8 ad-hoc text colours and no ink tokens — that is a pile, not a scale
+✗ FAIL   C11   Display sizes are fluid (clamp)
+         0/8 font-size uses clamp() or vw
+✗ FAIL   C12   text-wrap balance / pretty set
+         no text-wrap:balance/pretty — headings will widow
+✗ FAIL   C13   Measure capped in ch
+         no max-width in ch — paragraphs run full-bleed on wide screens
+- SKIP   C15   Numbers use tabular figures
+         no multi-digit numbers on the page
+- SKIP   E22   One easing across the site (≤2 curves)
+         no custom easing used
+✗ FAIL   E23   Scroll reveal fires once (unobserve)
+         observer never unobserves — reveals re-trigger on every pass
+✗ FAIL   E24   prefers-reduced-motion block present
+         no reduced-motion block — the page is broken, not stylish
+- SKIP   E25   Reduced motion resets hidden resting states
+         no reduced-motion block (see E24)
+! WARN   E27   rAF loops cancel on visibilitychange
+         rAF loops never pause in a background tab
+✗ FAIL   E28   No scale-on-hover for cards
+         1 scale-on-hover rule(s) — lift, don't zoom
+         ↳ examples/before.html:34  :hover { transform: scale(1.03); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+✗ FAIL   F29   No banned phrasing
+         8 banned phrase(s)
+         ↳ examples/before.html  Meridian Meridian Unlock the power of seamless re
+         ↳ examples/before.html  tiful platform that empowers your team to transform
+         ↳ examples/before.html  tive interface that empowers every member of your te
+         ↳ examples/before.html  Unlock the power of seamless reconciliation In today'
+✗ FAIL   F30   Numbers present in the copy
+         0 concrete figure(s) — a page of adjectives reads as generated
+✗ FAIL   F31   CTA labels name outcomes
+         2 generic CTA label(s)
+         ↳ examples/before.html:73  Get Started
+         ↳ examples/before.html:74  Learn More
+✗ FAIL   F32   H2s are claims, not labels
+         3 label-style H2(s)
+         ↳ examples/before.html:78  Features
+         ↳ examples/before.html:99  About
+         ↳ examples/before.html:107  Pricing
+✗ FAIL   F33   No emoji in UI
+         3 emoji in visible copy
+         ↳ examples/before.html:1  🚀
+         ↳ examples/before.html:1  🔒
+         ↳ examples/before.html:1  ✨
+✗ FAIL   G35   Explicit :focus-visible ring
+         no :focus-visible — the default ring is invisible on dark surfaces
+- SKIP   G36   Ambient layers are inert
+         no named ambient layers
+✗ FAIL   G37   Custom favicon
+         no favicon — the framework default is a tell
+✗ FAIL   G38   Title and meta description
+         no meta description.
+✗ FAIL   G41   Empty / error states written
+         1 placeholder state string(s)
+         ↳ examples/before.html:1  No data available
+✗ FAIL   D17   No horizontal scroll at 390px
+         scrollWidth 558 vs viewport 390
+✓ PASS   D18   Primary CTA above the fold at 1280×720
+         "Get Started" bottom 422 / viewport 720
+✓ PASS   G40   Console clean
+         no console errors
+✗ FAIL   E24L  Nothing invisible under reduced motion
+         1 text element(s) stuck invisible
+
+2/31 pass · 22 fail · 2 warn · 5 skip
+GATE RED — 22 lines. That is a direction problem, not a detail problem: go back to the direction lock.

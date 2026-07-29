@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meridian</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, -apple-system, sans-serif;
+    background: #ffffff;
+    color: #333333;
+    line-height: 1.6;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  header { padding: 20px 0; border-bottom: 1px solid #eeeeee; }
+  .logo { font-size: 20px; font-weight: 700; color: #6d28d9; }
+
+  .hero { text-align: center; padding: 80px 0; }
+  .hero h1 { font-size: 48px; font-weight: 800; margin: 0 0 20px; }
+  .hero p { font-size: 18px; color: #666666; margin: 0 auto 32px; max-width: 700px; }
+
+  .btn {
+    display: inline-block; padding: 14px 32px; border-radius: 8px;
+    text-decoration: none; font-weight: 600; margin: 0 6px;
+    transition: all 0.3s ease;
+  }
+  .btn-primary { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .btn-secondary { background: #f3f4f6; color: #111827; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 60px 0; }
+  .card {
+    background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 32px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  .card:hover { transform: scale(1.03); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .card h3 { font-size: 20px; margin: 0 0 12px; }
+  .card p { color: #6b7280; margin: 0; }
+  .icon { font-size: 32px; margin-bottom: 16px; }
+
+  .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 12px; padding: 24px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 0; }
+  .stat { text-align: center; }
+  .stat .value { font-size: 36px; font-weight: 800; color: #10b981; }
+  .stat .label { font-size: 14px; color: #9ca3af; }
+
+  section h2 { font-size: 36px; text-align: center; margin: 0 0 40px; }
+
+  .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  footer { background: #f9fafb; padding: 40px 0; text-align: center; color: #9ca3af; border-top: 1px solid #f59e0b; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container"><span class="logo">Meridian</span></div>
+</header>
+
+<div class="container">
+
+  <section class="hero">
+    <h1>Unlock the power of seamless reconciliation</h1>
+    <p>In today's fast-paced world, finance teams need a solution that just works. Meridian is a
+       powerful, intuitive and beautiful platform that empowers your team to transform the way
+       they close the books.</p>
+    <a href="#" class="btn btn-primary">Get Started</a>
+    <a href="#" class="btn btn-secondary">Learn More</a>
+  </section>
+
+  <section>
+    <h2>Features</h2>
+    <div class="cards reveal">
+      <div class="card">
+        <div class="icon">🚀</div>
+        <h3>Lightning Fast</h3>
+        <p>Our cutting-edge engine delivers a seamless experience, so you can focus on what matters most.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>Enterprise Ready</h3>
+        <p>Built for performance and designed to scale with your business as it grows.</p>
+      </div>
+      <div class="card">
+        <div class="icon">✨</div>
+        <h3>Beautifully Simple</h3>
+        <p>An intuitive interface that empowers every member of your team from day one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>About</h2>
+    <div class="glass">
+      <p>We believe that every finance team deserves better tools. Whether you're a startup or an
+         enterprise, Meridian is the one-stop shop for all your reconciliation needs.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pricing</h2>
+    <div class="stats reveal">
+      <div class="stat"><div class="value">No data available</div><div class="label">Plans</div></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container">© Meridian. Trusted by industry leaders.</div>
+</footer>
+
+<script>
+  // reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // floating logo
+  let t = 0;
+  function tick() {
+    t += 0.02;
+    document.querySelector('.logo').style.transform = 'translateY(' + Math.sin(t) * 3 + 'px)';
+    requestAnimationFrame(tick);
+  }
+  tick();
+</script>
+
+</body>
+</html>

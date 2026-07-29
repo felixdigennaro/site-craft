@@ -1,0 +1,13 @@
+{
+  "name": "site-craft-repo",
+  "private": true,
+  "description": "A design gate that actually runs — convenience scripts that proxy into skills/site-craft.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node skills/site-craft/tests/test_all.mjs",
+    "test:live": "node skills/site-craft/tests/test_all.mjs --live",
+    "gate": "node skills/site-craft/scripts/scaudit.mjs",
+    "demo": "node skills/site-craft/scripts/scaudit.mjs skills/site-craft/examples/before.html; node skills/site-craft/scripts/scaudit.mjs skills/site-craft/examples/after.html"
+  },
+  "engines": { "node": ">=18" }
+}

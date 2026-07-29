@@ -1,0 +1,266 @@
+/* ============================================================
+   site-craft — token spine + surface recipes
+   Brand-agnostic. Swap the hue values; keep the STRUCTURE.
+   Distilled from two shipped production surfaces.
+   ============================================================ */
+
+:root{
+  /* ── Grounds: two, so sections can sit at different depths ── */
+  --ground:      #06080f;
+  --ground-2:    #0b0e1a;
+
+  /* ── Panels: two translucent steps. Translucent, NOT solid grey —
+        a solid panel kills whatever ambient layer sits behind it. ── */
+  --panel:       rgba(120,160,255,.03);
+  --panel-2:     rgba(120,160,255,.06);
+
+  /* ── Hairlines: two. `hair` for resting, `hair-strong` for hover
+        and for anything that must read as an edge. 1px, never 2. ── */
+  --hair:        rgba(150,180,255,.11);
+  --hair-strong: rgba(150,180,255,.22);
+
+  /* ── Ink: FOUR stops. The single highest-leverage decision here.
+        3 stops = flat hierarchy. 6 = mush. 4 = readable structure. ── */
+  --ink:         #e8ecf5;   /* headings, key values */
+  --ink-soft:    #9aa4bd;   /* body, leads */
+  --ink-faint:   #7883a0;   /* labels, eyebrows, footnotes */
+  --ink-invert:  #04122e;   /* text ON the accent */
+
+  /* ── Accent: ONE hue, four roles. A second hue only if semantic. ── */
+  --accent:        #4d8dff;
+  --accent-bright: #8fb6ff;              /* hover / emphasis / big numbers */
+  --accent-deep:   #1c46a8;              /* gradient tail, filled tracks */
+  --accent-glow:   rgba(77,141,255,.22); /* every ambient shadow tints with this */
+  --accent-2:      #5fdfe6;              /* same family — a gradient partner, not a rival */
+
+  /* ── State: reserved. Never used decoratively. ── */
+  --pos:  #3ad0c0;
+  --warn: #e8c15a;
+  --neg:  #f2795f;
+
+  /* ── Geometry ── */
+  --maxw:   1080px;
+  --radius: 16px;
+  --s3: 24px; --s4: 40px; --s5: 64px; --s6: 104px;
+
+  /* ── Type: two families. Display gets negative tracking. ── */
+  --sans:    -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif;
+  --display: "Space Grotesk",-apple-system,"Segoe UI",system-ui,sans-serif;
+  --mono:    ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+
+  /* ── Motion: ONE easing for the whole site. ── */
+  --ease:      cubic-bezier(.2,.75,.2,1);
+  --ease-pop:  cubic-bezier(.2,.9,.3,1.2);  /* only for things that physically pop in */
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*{ box-sizing:border-box }
+html{ scroll-behavior:smooth; overflow-x:hidden }
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--sans); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden; max-width:100vw;
+  letter-spacing:-.011em;                 /* subtle global tightening — reads as "designed" */
+}
+
+/* Focus ring. Default rings are invisible on dark surfaces.
+   Explicit, accent-coloured, :focus-visible only (never on mouse). */
+:focus-visible{ outline:2px solid var(--accent-bright); outline-offset:3px; border-radius:5px }
+:focus:not(:focus-visible){ outline:none }
+
+/* ============================================================
+   TYPE
+   Every size is clamp(). Headings balance, paragraphs pretty.
+   Measure caps in ch, never px.
+   ============================================================ */
+h1,h2,h3{
+  margin:0; font-family:var(--display); font-weight:600;
+  letter-spacing:-.03em; line-height:1.05; text-wrap:balance;
+}
+h1{ font-size:clamp(2.4rem,6.4vw,4.4rem) }
+h2{ font-size:clamp(1.8rem,3.8vw,2.7rem); letter-spacing:-.025em }
+h3{ font-size:1.1rem }
+p { margin:0; text-wrap:pretty }
+
+.lead{ font-size:clamp(1.05rem,1.6vw,1.28rem); color:var(--ink-soft); max-width:58ch }
+
+/* Short display blocks balance so no line ends on a lone word (widow). */
+.lead,.card p,.stat .sl,.rule p{ text-wrap:balance }
+
+/* Eyebrow: small, wide-tracked, uppercase, faint. The counterweight
+   that makes a big headline read as designed rather than just big. */
+.eyebrow{
+  font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink-faint); margin:0;
+}
+
+/* EVERY number gets tabular figures. Non-negotiable — proportional
+   digits make counters and tables jitter as they animate. */
+.tnum,table,.stat .sv,.counter .cv{ font-variant-numeric:tabular-nums }
+
+/* Animated gradient text. Use on ONE element per viewport (wordmark
+   OR headline, not both). More than that and it reads as a toy. */
+.grad{
+  background:linear-gradient(100deg,
+    var(--ink) 0%, var(--ink) 24%,
+    var(--accent-bright) 46%, var(--accent-2) 54%, var(--accent-bright) 62%,
+    var(--ink) 84%);
+  background-size:250% auto;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:sheen 7s linear infinite;
+}
+@keyframes sheen{ to{ background-position:-250% center } }
+
+/* ============================================================
+   GLASS SURFACES
+   Translucent + blur + saturate. The `saturate` is what stops
+   glass from looking like grey plastic — do not drop it.
+   ============================================================ */
+.glass{
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(14px) saturate(125%);
+  -webkit-backdrop-filter:blur(14px) saturate(125%);
+  border:1px solid var(--hair);
+  box-shadow: inset 0 1px 0 0 rgba(255,255,255,.06),
+              0 1px 3px 0 rgba(0,0,0,.20);
+}
+.glass-strong{
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(20px) saturate(130%);
+  -webkit-backdrop-filter:blur(20px) saturate(130%);
+  border:1px solid var(--hair-strong);
+  box-shadow: inset 0 1px 0 0 rgba(255,255,255,.08),
+              0 4px 16px 0 rgba(0,0,0,.25);
+}
+
+/* ============================================================
+   DEPTH — the rule that separates expensive from cheap
+   Three parts, always: lit edge / seated shade / tinted ambient.
+   `0 4px 6px rgba(0,0,0,.1)` is an AI-slop tell.
+   ============================================================ */
+.card{
+  border:1px solid var(--hair);
+  border-radius:var(--radius);
+  background:var(--panel);
+  padding:30px;
+  display:flex; flex-direction:column; gap:16px;
+  transition:border-color .35s var(--ease),
+             background .35s var(--ease),
+             transform .35s var(--ease),
+             box-shadow .35s var(--ease);
+}
+.card:hover{
+  border-color:var(--hair-strong);
+  background:var(--panel-2);
+  transform:translateY(-3px);             /* lift. NEVER scale a card. */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06),
+              0 16px 40px -20px var(--accent-glow);
+}
+
+/* Halo — big blurred radial glow behind a key element.
+   Parent MUST have `overflow-x: clip` or these blow past 100vw
+   on mobile and cause the iOS rubber-band horizontal scroll. */
+.halo{
+  position:absolute; width:380px; height:380px; border-radius:50%;
+  background:radial-gradient(circle,var(--accent-glow) 0%,transparent 65%);
+  filter:blur(20px); pointer-events:none; opacity:.6;
+}
+.halo-sm{ width:200px; height:200px; filter:blur(16px); opacity:.45 }
+/* usage: <div class="halo-sm" aria-hidden style="top:-40px;left:30%"></div> */
+
+/* Rotating conic border-glow — for feature graphic boxes. */
+.lit-edge{ position:relative; overflow:hidden }
+.lit-edge::after{
+  content:""; position:absolute; inset:-1px; border-radius:inherit;
+  padding:1px; pointer-events:none;
+  background:conic-gradient(from 0deg, transparent 0deg,
+    var(--accent-glow) 40deg, rgba(95,223,230,.5) 90deg,
+    transparent 150deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:.5; animation:spin 8s linear infinite;
+}
+.lit-edge:hover::after{ opacity:.9 }
+@keyframes spin{ to{ transform:rotate(1turn) } }
+
+/* ============================================================
+   BUTTONS
+   Primary is glossy with a lit top edge + a slow sheen sweep.
+   Secondary is glass that glows toward the accent on hover.
+   ============================================================ */
+.btn{
+  font-size:.92rem; font-weight:500; letter-spacing:.01em; text-decoration:none;
+  padding:15px 54px; border-radius:100px;
+  display:inline-flex; align-items:center; gap:10px;
+  position:relative; overflow:hidden;
+  transition:transform .28s var(--ease), box-shadow .35s,
+             border-color .3s, color .3s, background .3s;
+}
+.btn .ar{ display:inline-block; transition:transform .3s var(--ease) }
+.btn:hover .ar{ transform:translateX(5px) }   /* the arrow leans forward */
+
+.btn-solid{
+  color:var(--ink-invert); font-weight:600;
+  background:linear-gradient(125deg,var(--accent-bright) 0%,var(--accent) 52%,var(--accent-deep) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4),
+              inset 0 -1px 3px rgba(5,18,46,.28),
+              0 8px 26px -8px var(--accent-glow);
+}
+.btn-solid::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(110deg,transparent 32%,rgba(255,255,255,.5) 50%,transparent 68%);
+  transform:translateX(-135%); animation:sweep 4.8s ease-in-out infinite;
+}
+@keyframes sweep{ 0%,100%{transform:translateX(-135%)} 52%,60%{transform:translateX(135%)} }
+.btn-solid:hover{
+  transform:translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5),
+              inset 0 -1px 3px rgba(5,18,46,.28),
+              0 16px 42px -8px var(--accent-glow);
+}
+
+.btn-ghost{
+  color:var(--ink); border:1px solid var(--hair-strong);
+  background:linear-gradient(180deg,rgba(120,160,255,.07),rgba(120,160,255,.02));
+  backdrop-filter:blur(10px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.btn-ghost:hover{
+  border-color:var(--accent); color:var(--accent-bright); transform:translateY(-2px);
+  background:linear-gradient(180deg,rgba(120,160,255,.13),rgba(120,160,255,.04));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14),
+              0 10px 30px -12px var(--accent-glow);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.wrap{ position:relative; z-index:2; max-width:var(--maxw); margin:0 auto; padding:0 24px }
+
+/* "One viewport, one idea" — use when the page is an ARGUMENT.
+   Use dense stacking instead when it's a catalogue. */
+section{
+  min-height:100svh; display:flex; flex-direction:column;
+  justify-content:center; align-items:center; padding:var(--s5) 0;
+}
+section > *{ width:100% }   /* else auto-margins shrink flex children */
+
+.sec-head{ display:flex; flex-direction:column; gap:20px; max-width:62ch; margin-bottom:48px }
+
+/* ============================================================
+   REDUCED MOTION — ships with the page or the page is broken
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    animation-delay:0ms!important;
+    transition:none!important;
+  }
+  .rev,.stagger>*{ opacity:1; transform:none; filter:none }
+  .grad{ color:var(--accent-bright) }
+  html{ scroll-behavior:auto }
+}

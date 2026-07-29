@@ -1,0 +1,197 @@
+{
+  "files": 1,
+  "counts": {
+    "pass": 31,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "results": [
+    {
+      "id": "A1",
+      "line": "Ambient layers present (≥2)",
+      "status": "pass",
+      "detail": "3/3 layer families (grain=2 halo=4 backdrop=1)"
+    },
+    {
+      "id": "A3",
+      "line": "No default flat shadows",
+      "status": "pass",
+      "detail": "no framework-default shadows"
+    },
+    {
+      "id": "A3b",
+      "line": "Ambient shadows use negative spread",
+      "status": "pass",
+      "detail": "3 ambient shadow layer(s), all with negative spread"
+    },
+    {
+      "id": "A4",
+      "line": "Glass uses saturate(), not blur alone",
+      "status": "pass",
+      "detail": "6 glass surface(s), all saturated"
+    },
+    {
+      "id": "A6",
+      "line": "Halo containers clip horizontally",
+      "status": "pass",
+      "detail": "5 halo(s), overflow-x clipped"
+    },
+    {
+      "id": "B7",
+      "line": "One accent hue family (≤3 chromatic families)",
+      "status": "pass",
+      "detail": "3 hue families: #0b0e1a #5fdfe6 #e8c15a"
+    },
+    {
+      "id": "B8",
+      "line": "Four ink stops in use",
+      "status": "pass",
+      "detail": "4 ink tokens"
+    },
+    {
+      "id": "C11",
+      "line": "Display sizes are fluid (clamp)",
+      "status": "pass",
+      "detail": "3/13 fluid"
+    },
+    {
+      "id": "C12",
+      "line": "text-wrap balance / pretty set",
+      "status": "pass",
+      "detail": "4 declaration(s)"
+    },
+    {
+      "id": "C13",
+      "line": "Measure capped in ch",
+      "status": "pass",
+      "detail": "4 measure cap(s) in ch"
+    },
+    {
+      "id": "C15",
+      "line": "Numbers use tabular figures",
+      "status": "pass",
+      "detail": "1 declaration(s)"
+    },
+    {
+      "id": "E22",
+      "line": "One easing across the site (≤2 curves)",
+      "status": "pass",
+      "detail": "2 curve(s): cubic-bezier(.2,.75,.2,1) cubic-bezier(.2,.9,.3,1.2)"
+    },
+    {
+      "id": "E23",
+      "line": "Scroll reveal fires once (unobserve)",
+      "status": "pass",
+      "detail": "1 observer(s), 1 unobserve call(s)"
+    },
+    {
+      "id": "E24",
+      "line": "prefers-reduced-motion block present",
+      "status": "pass",
+      "detail": "1 block(s)"
+    },
+    {
+      "id": "E25",
+      "line": "Reduced motion resets hidden resting states",
+      "status": "pass",
+      "detail": "resting opacity:0 states are reset"
+    },
+    {
+      "id": "E27",
+      "line": "rAF loops cancel on visibilitychange",
+      "status": "pass",
+      "detail": "4 rAF call(s), visibility handled"
+    },
+    {
+      "id": "E28",
+      "line": "No scale-on-hover for cards",
+      "status": "pass",
+      "detail": "no scale-on-hover"
+    },
+    {
+      "id": "F29",
+      "line": "No banned phrasing",
+      "status": "pass",
+      "detail": "clean"
+    },
+    {
+      "id": "F30",
+      "line": "Numbers present in the copy",
+      "status": "pass",
+      "detail": "5 concrete figure(s)"
+    },
+    {
+      "id": "F31",
+      "line": "CTA labels name outcomes",
+      "status": "pass",
+      "detail": "CTA labels are specific"
+    },
+    {
+      "id": "F32",
+      "line": "H2s are claims, not labels",
+      "status": "pass",
+      "detail": "no label-style H2s"
+    },
+    {
+      "id": "F33",
+      "line": "No emoji in UI",
+      "status": "pass",
+      "detail": "no emoji"
+    },
+    {
+      "id": "G35",
+      "line": "Explicit :focus-visible ring",
+      "status": "pass",
+      "detail": "2 rule(s)"
+    },
+    {
+      "id": "G36",
+      "line": "Ambient layers are inert",
+      "status": "pass",
+      "detail": "4 layer(s), all pointer-events:none"
+    },
+    {
+      "id": "G37",
+      "line": "Custom favicon",
+      "status": "pass",
+      "detail": "1 icon link(s)"
+    },
+    {
+      "id": "G38",
+      "line": "Title and meta description",
+      "status": "pass",
+      "detail": "both present"
+    },
+    {
+      "id": "G41",
+      "line": "Empty / error states written",
+      "status": "pass",
+      "detail": "no boilerplate state strings"
+    },
+    {
+      "id": "D17",
+      "line": "No horizontal scroll at 390px",
+      "status": "pass",
+      "detail": "scrollWidth 390 vs viewport 390"
+    },
+    {
+      "id": "D18",
+      "line": "Primary CTA above the fold at 1280×720",
+      "status": "pass",
+      "detail": "\"Run my first close →\" bottom 452 / viewport 720"
+    },
+    {
+      "id": "G40",
+      "line": "Console clean",
+      "status": "pass",
+      "detail": "no console errors"
+    },
+    {
+      "id": "E24L",
+      "line": "Nothing invisible under reduced motion",
+      "status": "pass",
+      "detail": "all content painted"
+    }
+  ]
+}

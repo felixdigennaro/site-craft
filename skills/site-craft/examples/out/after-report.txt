@@ -1,0 +1,68 @@
+
+site-craft audit — 1 file(s)
+────────────────────────────────────────────────────────────
+✓ PASS   A1    Ambient layers present (≥2)
+         3/3 layer families (grain=2 halo=4 backdrop=1)
+✓ PASS   A3    No default flat shadows
+         no framework-default shadows
+✓ PASS   A3b   Ambient shadows use negative spread
+         3 ambient shadow layer(s), all with negative spread
+✓ PASS   A4    Glass uses saturate(), not blur alone
+         6 glass surface(s), all saturated
+✓ PASS   A6    Halo containers clip horizontally
+         5 halo(s), overflow-x clipped
+✓ PASS   B7    One accent hue family (≤3 chromatic families)
+         3 hue families: #0b0e1a #5fdfe6 #e8c15a
+✓ PASS   B8    Four ink stops in use
+         4 ink tokens
+✓ PASS   C11   Display sizes are fluid (clamp)
+         3/13 fluid
+✓ PASS   C12   text-wrap balance / pretty set
+         4 declaration(s)
+✓ PASS   C13   Measure capped in ch
+         4 measure cap(s) in ch
+✓ PASS   C15   Numbers use tabular figures
+         1 declaration(s)
+✓ PASS   E22   One easing across the site (≤2 curves)
+         2 curve(s): cubic-bezier(.2,.75,.2,1) cubic-bezier(.2,.9,.3,1.2)
+✓ PASS   E23   Scroll reveal fires once (unobserve)
+         1 observer(s), 1 unobserve call(s)
+✓ PASS   E24   prefers-reduced-motion block present
+         1 block(s)
+✓ PASS   E25   Reduced motion resets hidden resting states
+         resting opacity:0 states are reset
+✓ PASS   E27   rAF loops cancel on visibilitychange
+         4 rAF call(s), visibility handled
+✓ PASS   E28   No scale-on-hover for cards
+         no scale-on-hover
+✓ PASS   F29   No banned phrasing
+         clean
+✓ PASS   F30   Numbers present in the copy
+         5 concrete figure(s)
+✓ PASS   F31   CTA labels name outcomes
+         CTA labels are specific
+✓ PASS   F32   H2s are claims, not labels
+         no label-style H2s
+✓ PASS   F33   No emoji in UI
+         no emoji
+✓ PASS   G35   Explicit :focus-visible ring
+         2 rule(s)
+✓ PASS   G36   Ambient layers are inert
+         4 layer(s), all pointer-events:none
+✓ PASS   G37   Custom favicon
+         1 icon link(s)
+✓ PASS   G38   Title and meta description
+         both present
+✓ PASS   G41   Empty / error states written
+         no boilerplate state strings
+✓ PASS   D17   No horizontal scroll at 390px
+         scrollWidth 390 vs viewport 390
+✓ PASS   D18   Primary CTA above the fold at 1280×720
+         "Run my first close →" bottom 452 / viewport 720
+✓ PASS   G40   Console clean
+         no console errors
+✓ PASS   E24L  Nothing invisible under reduced motion
+         all content painted
+
+31/31 pass · 0 fail · 0 warn · 0 skip
+GATE GREEN — ship it.

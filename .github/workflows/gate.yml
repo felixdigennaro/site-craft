@@ -1,0 +1,40 @@
+name: gate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skills/site-craft
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 100 assertions, no dependencies. Every rule is proven to fire on a
+      # violating fixture and to stay quiet on a clean one.
+      - name: test suite
+        run: node tests/test_all.mjs
+
+      # The tool doing the thing it claims: the slop fixture must trip the
+      # gate (exit 1) and the corrected page must clear it (exit 0).
+      - name: gate fails on the slop fixture
+        run: |
+          if node scripts/scaudit.mjs examples/before.html; then
+            echo "expected a non-zero exit on before.html"; exit 1
+          fi
+
+      - name: gate passes on the corrected page
+        run: node scripts/scaudit.mjs examples/after.html
+
+      # Browser pass — the four rules a screenshot never catches.
+      - name: install chromium
+        run: npm i -D playwright && npx playwright install --with-deps chromium
+
+      - name: test suite with the browser pass
+        run: node tests/test_all.mjs --live

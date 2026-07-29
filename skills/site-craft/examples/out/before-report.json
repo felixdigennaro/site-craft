@@ -1,0 +1,330 @@
+{
+  "files": 1,
+  "counts": {
+    "pass": 2,
+    "fail": 22,
+    "warn": 2,
+    "skip": 5
+  },
+  "results": [
+    {
+      "id": "A1",
+      "line": "Ambient layers present (≥2)",
+      "status": "fail",
+      "detail": "only 0/3 layer families — a flat background is the loudest slop tell"
+    },
+    {
+      "id": "A3",
+      "line": "No default flat shadows",
+      "status": "fail",
+      "detail": "3 default shadow(s)",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 25,
+          "text": "box-shadow: 0 4px 6px rgba(0,0,0,0.1)"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 31,
+          "text": "box-shadow: 0 4px 6px rgba(0,0,0,0.1)"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 34,
+          "text": "box-shadow: 0 2px 4px rgba(0,0,0,0.1)"
+        }
+      ]
+    },
+    {
+      "id": "A3b",
+      "line": "Ambient shadows use negative spread",
+      "status": "warn",
+      "detail": "3/3 ambient shadow layer(s) with no negative spread",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 25,
+          "text": "0 4px 6px rgba(0,0,0,0.1)"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 31,
+          "text": "0 4px 6px rgba(0,0,0,0.1)"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 34,
+          "text": "0 2px 4px rgba(0,0,0,0.1)"
+        }
+      ]
+    },
+    {
+      "id": "A4",
+      "line": "Glass uses saturate(), not blur alone",
+      "status": "fail",
+      "detail": "1/1 blur without saturate — renders as grey plastic",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 39,
+          "text": "backdrop-filter: blur(10px)"
+        }
+      ]
+    },
+    {
+      "id": "A6",
+      "line": "Halo containers clip horizontally",
+      "status": "skip",
+      "detail": "no halos detected"
+    },
+    {
+      "id": "B7",
+      "line": "One accent hue family (≤3 chromatic families)",
+      "status": "fail",
+      "detail": "5 hue families: #6d28d9 #ec4899 #111827 #10b981 #f59e0b — more than accent + state"
+    },
+    {
+      "id": "B8",
+      "line": "Four ink stops in use",
+      "status": "fail",
+      "detail": "8 ad-hoc text colours and no ink tokens — that is a pile, not a scale"
+    },
+    {
+      "id": "C11",
+      "line": "Display sizes are fluid (clamp)",
+      "status": "fail",
+      "detail": "0/8 font-size uses clamp() or vw"
+    },
+    {
+      "id": "C12",
+      "line": "text-wrap balance / pretty set",
+      "status": "fail",
+      "detail": "no text-wrap:balance/pretty — headings will widow"
+    },
+    {
+      "id": "C13",
+      "line": "Measure capped in ch",
+      "status": "fail",
+      "detail": "no max-width in ch — paragraphs run full-bleed on wide screens"
+    },
+    {
+      "id": "C15",
+      "line": "Numbers use tabular figures",
+      "status": "skip",
+      "detail": "no multi-digit numbers on the page"
+    },
+    {
+      "id": "E22",
+      "line": "One easing across the site (≤2 curves)",
+      "status": "skip",
+      "detail": "no custom easing used"
+    },
+    {
+      "id": "E23",
+      "line": "Scroll reveal fires once (unobserve)",
+      "status": "fail",
+      "detail": "observer never unobserves — reveals re-trigger on every pass"
+    },
+    {
+      "id": "E24",
+      "line": "prefers-reduced-motion block present",
+      "status": "fail",
+      "detail": "no reduced-motion block — the page is broken, not stylish"
+    },
+    {
+      "id": "E25",
+      "line": "Reduced motion resets hidden resting states",
+      "status": "skip",
+      "detail": "no reduced-motion block (see E24)"
+    },
+    {
+      "id": "E27",
+      "line": "rAF loops cancel on visibilitychange",
+      "status": "warn",
+      "detail": "rAF loops never pause in a background tab"
+    },
+    {
+      "id": "E28",
+      "line": "No scale-on-hover for cards",
+      "status": "fail",
+      "detail": "1 scale-on-hover rule(s) — lift, don't zoom",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 34,
+          "text": ":hover { transform: scale(1.03); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }"
+        }
+      ]
+    },
+    {
+      "id": "F29",
+      "line": "No banned phrasing",
+      "status": "fail",
+      "detail": "8 banned phrase(s)",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 0,
+          "text": "Meridian Meridian Unlock the power of seamless re"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 0,
+          "text": "tiful platform that empowers your team to transform"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 0,
+          "text": "tive interface that empowers every member of your te"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 0,
+          "text": "Unlock the power of seamless reconciliation In today'"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 0,
+          "text": "e engine delivers a seamless experience, so you can f"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 0,
+          "text": "se, Meridian is the one-stop shop for all your reconc"
+        }
+      ]
+    },
+    {
+      "id": "F30",
+      "line": "Numbers present in the copy",
+      "status": "fail",
+      "detail": "0 concrete figure(s) — a page of adjectives reads as generated"
+    },
+    {
+      "id": "F31",
+      "line": "CTA labels name outcomes",
+      "status": "fail",
+      "detail": "2 generic CTA label(s)",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 73,
+          "text": "Get Started"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 74,
+          "text": "Learn More"
+        }
+      ]
+    },
+    {
+      "id": "F32",
+      "line": "H2s are claims, not labels",
+      "status": "fail",
+      "detail": "3 label-style H2(s)",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 78,
+          "text": "Features"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 99,
+          "text": "About"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 107,
+          "text": "Pricing"
+        }
+      ]
+    },
+    {
+      "id": "F33",
+      "line": "No emoji in UI",
+      "status": "fail",
+      "detail": "3 emoji in visible copy",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 1,
+          "text": "🚀"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 1,
+          "text": "🔒"
+        },
+        {
+          "file": "examples/before.html",
+          "line": 1,
+          "text": "✨"
+        }
+      ]
+    },
+    {
+      "id": "G35",
+      "line": "Explicit :focus-visible ring",
+      "status": "fail",
+      "detail": "no :focus-visible — the default ring is invisible on dark surfaces"
+    },
+    {
+      "id": "G36",
+      "line": "Ambient layers are inert",
+      "status": "skip",
+      "detail": "no named ambient layers"
+    },
+    {
+      "id": "G37",
+      "line": "Custom favicon",
+      "status": "fail",
+      "detail": "no favicon — the framework default is a tell"
+    },
+    {
+      "id": "G38",
+      "line": "Title and meta description",
+      "status": "fail",
+      "detail": "no meta description."
+    },
+    {
+      "id": "G41",
+      "line": "Empty / error states written",
+      "status": "fail",
+      "detail": "1 placeholder state string(s)",
+      "hits": [
+        {
+          "file": "examples/before.html",
+          "line": 1,
+          "text": "No data available"
+        }
+      ]
+    },
+    {
+      "id": "D17",
+      "line": "No horizontal scroll at 390px",
+      "status": "fail",
+      "detail": "scrollWidth 558 vs viewport 390"
+    },
+    {
+      "id": "D18",
+      "line": "Primary CTA above the fold at 1280×720",
+      "status": "pass",
+      "detail": "\"Get Started\" bottom 422 / viewport 720"
+    },
+    {
+      "id": "G40",
+      "line": "Console clean",
+      "status": "pass",
+      "detail": "no console errors"
+    },
+    {
+      "id": "E24L",
+      "line": "Nothing invisible under reduced motion",
+      "status": "fail",
+      "detail": "1 text element(s) stuck invisible"
+    }
+  ]
+}

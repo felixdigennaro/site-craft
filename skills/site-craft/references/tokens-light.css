@@ -1,0 +1,211 @@
+/* ============================================================
+   site-craft — light-ground token spine
+
+   Light is not "dark with the colours swapped". Three things
+   genuinely invert, and getting them wrong is what makes a light
+   page look flat while the dark version of the same design looks
+   expensive:
+
+   1. THE LIT EDGE MOVES. On dark, light comes from above and the
+      highlight sits on the TOP inner edge. On light, the surface is
+      already bright — what reads as depth is the *shadow* on the
+      top inner edge and a subtle bright edge at the BOTTOM.
+   2. AMBIENT SHADOWS GO NEUTRAL. An accent-tinted glow on white
+      reads as a rendering bug, not as light. Tint at most 6-8%,
+      and lean on a cool neutral instead.
+   3. GRAIN AND HALOS DROP HARD. Grain at .038 over white is visible
+      dirt — use .018 with multiply. Halos need far lower alpha or
+      they look like printing misregistration.
+
+   Everything else — four ink stops, one accent hue, one easing,
+   clamp type, ch measures — is identical. Swap the hues; keep the
+   structure.
+   ============================================================ */
+
+:root{
+  /* ── Grounds: warm-neutral, never pure #fff. Pure white has no
+        room above it, so nothing can read as "raised". ── */
+  --ground:      #fbfbfd;
+  --ground-2:    #f4f5f8;
+
+  /* ── Panels: on light these are near-white with a cool cast,
+        NOT grey fills. A grey card on a white page reads as disabled. ── */
+  --panel:       rgba(255,255,255,.72);
+  --panel-2:     rgba(255,255,255,.94);
+
+  /* ── Hairlines: darker than the ground, low alpha. ── */
+  --hair:        rgba(16,24,48,.10);
+  --hair-strong: rgba(16,24,48,.18);
+
+  /* ── Ink: four stops, same roles, inverted ramp. ── */
+  --ink:         #0f1524;   /* headings, key values */
+  --ink-soft:    #4a5468;   /* body, leads */
+  --ink-faint:   #78829a;   /* labels, eyebrows, footnotes */
+  --ink-invert:  #ffffff;   /* text ON the accent */
+
+  /* ── Accent: the SAME hue, pushed darker. A hue that reads well
+        on a dark ground is usually too light to sit on white — the
+        mid stop must carry text contrast on its own. ── */
+  --accent:        #2563c9;
+  --accent-bright: #1b4ea3;   /* on light, "bright" means MORE contrast, i.e. darker */
+  --accent-deep:   #0f2f6b;
+  --accent-glow:   rgba(37,99,201,.16);   /* used sparingly — see note 2 above */
+  --accent-2:      #0f8a95;
+  --shade:         rgba(16,24,48,.10);    /* the neutral that does the real depth work */
+
+  --pos:  #0f7a63;
+  --warn: #8a6212;
+  --neg:  #b23a24;
+
+  --maxw:   1080px;
+  --radius: 16px;
+  --s3: 24px; --s4: 40px; --s5: 64px; --s6: 104px;
+
+  --sans:    -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif;
+  --display: -apple-system,"Segoe UI",system-ui,sans-serif;
+  --mono:    ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+
+  --ease:      cubic-bezier(.2,.75,.2,1);
+  --ease-pop:  cubic-bezier(.2,.9,.3,1.2);
+}
+
+*{ box-sizing:border-box }
+html{ scroll-behavior:smooth; overflow-x:hidden; background:var(--ground) }
+body{
+  margin:0; background:transparent; color:var(--ink);
+  font-family:var(--sans); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden; max-width:100vw; letter-spacing:-.011em;
+}
+
+/* On light the accent ring has enough contrast on its own. */
+:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:5px }
+:focus:not(:focus-visible){ outline:none }
+
+/* ============================================================
+   DEPTH — inverted. Shade on top, light at the bottom.
+   ============================================================ */
+.card{
+  border:1px solid var(--hair);
+  border-radius:var(--radius);
+  background:var(--panel);
+  padding:30px;
+  display:flex; flex-direction:column; gap:16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),      /* the sheet's own top face */
+    0 1px 2px var(--shade),                  /* contact shadow, tight */
+    0 12px 28px -14px rgba(16,24,48,.18);    /* ambient, neutral, negative spread */
+  transition:border-color .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.card:hover{
+  border-color:var(--hair-strong);
+  transform:translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 2px 4px var(--shade),
+    0 22px 44px -18px rgba(16,24,48,.24);
+}
+
+/* Glass on light = DARK translucency, not white-on-white.
+   White glass over a light ground has nothing to blur and just
+   flattens into the page. */
+.glass{
+  background:rgba(16,24,48,.03);
+  backdrop-filter:blur(14px) saturate(115%);
+  -webkit-backdrop-filter:blur(14px) saturate(115%);
+  border:1px solid var(--hair);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 1px 3px var(--shade);
+}
+
+/* ============================================================
+   AMBIENT LAYERS — same three families, much quieter
+   ============================================================ */
+.grain{
+  position:fixed; inset:0; z-index:45; pointer-events:none;
+  opacity:.018;                        /* .038 on dark → .015-.02 on light */
+  mix-blend-mode:multiply;             /* overlay washes out over white */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:140px;
+}
+
+.halo,.halo-sm{
+  position:absolute; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle,var(--accent-glow) 0%,transparent 68%);
+  filter:blur(26px);                   /* blur harder so the edge never bands */
+  opacity:.34;                         /* ~half the dark-ground value */
+}
+.halo{ width:380px; height:380px }
+.halo-sm{ width:220px; height:220px; filter:blur(20px); opacity:.26 }
+
+/* Grid backdrop: darker lines, and it must be masked or it reads
+   as graph paper rather than as depth. */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(16,24,48,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(16,24,48,.045) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 18%,transparent 72%);
+          mask-image:radial-gradient(ellipse at 50% 0%,#000 18%,transparent 72%);
+}
+
+/* No cursor spotlight on light grounds. `mix-blend-mode:screen` over
+   white is a no-op, and every other blend mode reads as a smudge. */
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-solid{
+  color:var(--ink-invert); font-weight:600;
+  background:linear-gradient(125deg,var(--accent) 0%,var(--accent-bright) 60%,var(--accent-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    0 1px 2px rgba(16,24,48,.16),
+    0 10px 24px -10px rgba(37,99,201,.5);
+}
+.btn-solid:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.34),
+    0 2px 4px rgba(16,24,48,.16),
+    0 18px 36px -12px rgba(37,99,201,.55);
+}
+.btn-ghost{
+  color:var(--ink); border:1px solid var(--hair-strong); background:rgba(255,255,255,.7);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px var(--shade);
+}
+.btn-ghost:hover{ border-color:var(--accent); color:var(--accent); transform:translateY(-2px) }
+
+/* ============================================================
+   Gradient text on light: the mid stops must stay dark enough to
+   read. A gradient that passes through a light tint produces an
+   unreadable band across the middle of the headline.
+   ============================================================ */
+.grad{
+  background:linear-gradient(100deg,
+    var(--ink) 0%, var(--ink) 30%,
+    var(--accent) 48%, var(--accent-deep) 56%, var(--accent) 64%,
+    var(--ink) 82%);
+  background-size:250% auto;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:sheen 7s linear infinite;
+}
+@keyframes sheen{ to{ background-position:-250% center } }
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important; animation-iteration-count:1!important;
+    animation-delay:0ms!important; transition:none!important;
+  }
+  .rev,.stagger>*{ opacity:1; transform:none; filter:none }
+  .grad{ color:var(--accent) }
+  html{ scroll-behavior:auto }
+}
+
+/* ============================================================
+   AUTOMATIC PAIRING
+   To ship both, load tokens.css and override inside this query —
+   or set data-theme on <html> and duplicate the :root block.
+   Do NOT try to express both with one set of alpha values: the
+   lit-edge inversion above cannot be expressed as an alpha swap.
+   ============================================================ */

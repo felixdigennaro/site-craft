@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meridian — reconciliation for finance teams</title>
+<meta name="description" content="Close the month in three days instead of eleven. Meridian matches your ledger against six upstream systems, flags the 2% that disagree, and hands an auditor the trail.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2306080f'/><text x='16' y='23' font-family='system-ui' font-size='19' font-weight='700' text-anchor='middle' fill='%238fb6ff'>M</text></svg>">
+<style>
+/* ── token spine ─────────────────────────────────────────────── */
+:root{
+  --ground:#06080f; --ground-2:#0b0e1a;
+  --panel:rgba(120,160,255,.03); --panel-2:rgba(120,160,255,.06);
+  --hair:rgba(150,180,255,.11); --hair-strong:rgba(150,180,255,.22);
+  --ink:#e8ecf5; --ink-soft:#9aa4bd; --ink-faint:#7883a0; --ink-invert:#04122e;
+  --accent:#4d8dff; --accent-bright:#8fb6ff; --accent-deep:#1c46a8;
+  --accent-glow:rgba(77,141,255,.22); --accent-2:#5fdfe6; --warn:#e8c15a;
+  --maxw:1080px; --radius:16px;
+  --s3:24px; --s4:40px; --s5:64px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif;
+  --ease:cubic-bezier(.2,.75,.2,1); --ease-pop:cubic-bezier(.2,.9,.3,1.2);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; overflow-x:hidden; background:var(--ground)}
+body{
+  margin:0; background:transparent; color:var(--ink); font-family:var(--sans);
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden; max-width:100vw; letter-spacing:-.011em;
+}
+:focus-visible{outline:2px solid var(--accent-bright); outline-offset:3px; border-radius:5px}
+:focus:not(:focus-visible){outline:none}
+
+/* ── ambient layer 1 · fixed hairline grid, masked ───────────── */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(150,180,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(150,180,255,.05) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 18%,transparent 72%);
+  mask-image:radial-gradient(ellipse at 50% 0%,#000 18%,transparent 72%);
+}
+/* ── ambient layer 2 · grain ─────────────────────────────────── */
+.grain{
+  position:fixed; inset:0; z-index:45; pointer-events:none;
+  opacity:.038; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:140px;
+}
+/* ── ambient layer 3 · halos + cursor spotlight ──────────────── */
+.halo,.halo-sm{
+  position:absolute; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle,var(--accent-glow) 0%,transparent 65%);
+  filter:blur(20px); opacity:.55;
+}
+.halo{width:380px; height:380px}
+.halo-sm{width:220px; height:220px; filter:blur(16px); opacity:.42}
+.spot{
+  position:fixed; left:0; top:0; width:620px; height:620px; z-index:1;
+  pointer-events:none; border-radius:50%; transform:translate(-50%,-50%);
+  opacity:0; transition:opacity .5s; mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(77,141,255,.10),rgba(95,223,230,.03) 42%,transparent 65%);
+}
+
+/* ── type ────────────────────────────────────────────────────── */
+h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.03em; line-height:1.06; text-wrap:balance}
+h1{font-size:clamp(2.2rem,5.4vw,3.6rem)}
+h2{font-size:clamp(1.6rem,3.4vw,2.4rem); letter-spacing:-.025em}
+h3{font-size:1.06rem}
+p{margin:0; text-wrap:pretty}
+.lead{font-size:clamp(1rem,1.5vw,1.2rem); color:var(--ink-soft); max-width:58ch; text-wrap:balance}
+.eyebrow{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin:0}
+.tnum{font-variant-numeric:tabular-nums}
+.em{color:var(--accent-bright)}
+
+/* ── layout ──────────────────────────────────────────────────── */
+.wrap{position:relative; z-index:2; max-width:var(--maxw); margin:0 auto; padding:0 24px}
+header{position:sticky; top:0; z-index:30; backdrop-filter:blur(16px) saturate(120%);
+  -webkit-backdrop-filter:blur(16px) saturate(120%);
+  background:linear-gradient(rgba(6,8,15,.74),rgba(6,8,15,.06)); border-bottom:1px solid var(--hair)}
+.bar{max-width:var(--maxw); margin:0 auto; padding:14px 24px; display:flex; align-items:center; justify-content:space-between}
+.mark{font-weight:700; letter-spacing:.06em; color:var(--ink)}
+section{padding:var(--s5) 0}
+/* hero: no min-height, no stacked padding — the CTA must clear a 720px fold */
+.hero{position:relative; overflow-x:clip; text-align:center; padding:56px 0 var(--s5)}
+.sec-head{display:flex; flex-direction:column; gap:16px; max-width:62ch; margin:0 auto var(--s4); text-align:center; align-items:center}
+
+/* ── motion ──────────────────────────────────────────────────── */
+.stagger>*{opacity:0; transform:translateY(16px); animation:rise .9s var(--ease) forwards}
+.stagger>*:nth-child(1){animation-delay:.05s}.stagger>*:nth-child(2){animation-delay:.16s}
+.stagger>*:nth-child(3){animation-delay:.28s}.stagger>*:nth-child(4){animation-delay:.4s}
+@keyframes rise{to{opacity:1; transform:none}}
+.rev{opacity:0; transform:translateY(22px); filter:blur(5px);
+  transition:opacity .8s var(--ease), transform .8s var(--ease), filter .8s}
+.rev.in{opacity:1; transform:none; filter:none}
+
+/* ── buttons ─────────────────────────────────────────────────── */
+.cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:6px}
+.btn{font-size:.92rem; font-weight:500; text-decoration:none; padding:14px 34px; border-radius:100px;
+  display:inline-flex; align-items:center; gap:9px; position:relative; overflow:hidden;
+  transition:transform .28s var(--ease), box-shadow .35s var(--ease), border-color .3s, color .3s, background .3s}
+.btn .ar{display:inline-block; transition:transform .3s var(--ease)}
+.btn:hover .ar{transform:translateX(5px)}
+.btn-solid{color:var(--ink-invert); font-weight:600;
+  background:linear-gradient(125deg,var(--accent-bright) 0%,var(--accent) 52%,var(--accent-deep) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4), inset 0 -1px 3px rgba(5,18,46,.28),
+             0 8px 26px -8px var(--accent-glow)}
+.btn-solid:hover{transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 3px rgba(5,18,46,.28),
+             0 16px 42px -8px var(--accent-glow)}
+.btn-ghost{color:var(--ink); border:1px solid var(--hair-strong);
+  background:linear-gradient(180deg,rgba(120,160,255,.07),rgba(120,160,255,.02));
+  backdrop-filter:blur(10px) saturate(120%); -webkit-backdrop-filter:blur(10px) saturate(120%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.btn-ghost:hover{border-color:var(--accent); color:var(--accent-bright); transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 10px 30px -12px var(--accent-glow)}
+
+/* ── surfaces ────────────────────────────────────────────────── */
+.cards{display:grid; grid-template-columns:repeat(3,1fr); gap:22px}
+.card{border:1px solid var(--hair); border-radius:var(--radius); background:var(--panel);
+  padding:28px; display:flex; flex-direction:column; gap:12px; text-align:center; align-items:center;
+  transition:border-color .35s var(--ease), background .35s var(--ease),
+             transform .35s var(--ease), box-shadow .35s var(--ease)}
+.card:hover{border-color:var(--hair-strong); background:var(--panel-2); transform:translateY(-3px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 16px 40px -20px var(--accent-glow)}
+.card p{color:var(--ink-soft); font-size:.95rem; max-width:34ch}
+.glyph{width:38px; height:38px; border-radius:11px; border:1px solid var(--hair-strong);
+  background:linear-gradient(160deg,var(--panel-2),var(--panel));
+  display:flex; align-items:center; justify-content:center; color:var(--accent-bright); font-weight:600}
+
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:760px; margin:0 auto}
+.stat{border:1px solid var(--hair); border-radius:14px; background:var(--panel); padding:24px 20px;
+  text-align:center; transition:border-color .3s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease)}
+.stat:hover{border-color:var(--hair-strong); transform:translateY(-3px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 16px 40px -20px var(--accent-glow)}
+.stat .sv{font-size:2.1rem; font-weight:600; letter-spacing:-.02em; color:var(--accent-bright); line-height:1}
+.stat .sl{font-size:.84rem; color:var(--ink-soft); margin-top:8px; text-wrap:balance}
+.stat .sf{font-size:.72rem; color:var(--ink-faint); margin-top:6px}
+
+.note{border:1px solid var(--hair); border-radius:var(--radius); background:var(--panel);
+  padding:var(--s3); max-width:70ch; margin:0 auto; text-align:center;
+  backdrop-filter:blur(14px) saturate(125%); -webkit-backdrop-filter:blur(14px) saturate(125%)}
+.note .wl{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--warn)}
+.note p{color:var(--ink-soft); font-size:.95rem; margin-top:10px}
+
+footer{border-top:1px solid var(--hair); padding:var(--s4) 0; margin-top:var(--s5);
+  text-align:center; font-size:12px; color:var(--ink-faint)}
+
+@media (max-width:720px){ .cards,.stats{grid-template-columns:1fr} }
+
+/* ── reduced motion — nothing may be left invisible ──────────── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important; animation-iteration-count:1!important;
+    animation-delay:0ms!important; transition:none!important;
+  }
+  .rev,.stagger>*{opacity:1; transform:none; filter:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="spot" id="spot"></div>
+
+<header><div class="bar"><span class="mark">MERIDIAN</span><a class="btn btn-ghost" style="padding:9px 20px" href="#close">Run my first close <span class="ar">&rarr;</span></a></div></header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="halo-sm" aria-hidden style="top:10px; left:28%"></div>
+    <div class="halo-sm" aria-hidden style="top:60px; left:72%"></div>
+    <div class="stagger">
+      <p class="eyebrow">Reconciliation for finance teams</p>
+      <h1>Close the month in <span class="tnum">3</span> days, not <span class="tnum">11</span> — and <span class="em">show your work</span>.</h1>
+      <p class="lead" style="margin:14px auto 0">Controllers at 40-person and 4,000-person companies use Meridian to match the ledger
+        against six upstream systems, flag the <span class="tnum">2%</span> that disagree, and hand an auditor the trail.
+        Free until your first close.</p>
+      <div class="cta-row" id="close">
+        <a class="btn btn-solid" href="#how">Run my first close <span class="ar">&rarr;</span></a>
+        <a class="btn btn-ghost" href="#how">See a live reconciliation <span class="ar">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="sec-head rev">
+      <p class="eyebrow">What it does</p>
+      <h2>Three things a spreadsheet can't do.</h2>
+    </div>
+    <div class="cards rev">
+      <div class="card">
+        <span class="glyph">01</span>
+        <h3>Match across six systems</h3>
+        <p>Bank, ERP, billing, payroll, expenses, custody — reconciled against one ledger in a single pass.</p>
+      </div>
+      <div class="card">
+        <span class="glyph">02</span>
+        <h3>Surface only the breaks</h3>
+        <p>The <span class="tnum">98%</span> that agrees closes itself. You look at what didn't, with the reason attached.</p>
+      </div>
+      <div class="card">
+        <span class="glyph">03</span>
+        <h3>Leave a trail</h3>
+        <p>Every match keeps its inputs and its rule, so an auditor can re-derive it without asking you.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head rev">
+      <p class="eyebrow">Measured</p>
+      <h2>Numbers from live closes, not a pitch deck.</h2>
+    </div>
+    <div class="stats rev">
+      <div class="stat">
+        <div class="sv tnum" data-count="3" data-suf=" days">0</div>
+        <div class="sl">Median time to close</div>
+        <div class="sf">median over the last 200 closes</div>
+      </div>
+      <div class="stat">
+        <div class="sv tnum" data-count="98.1" data-dec="1" data-suf="%">0</div>
+        <div class="sl">Matched without a human</div>
+        <div class="sf">trailing 90 days, all customers</div>
+      </div>
+      <div class="stat">
+        <div class="sv tnum" data-count="24" data-suf=" hours">0</div>
+        <div class="sl">From connection to first match</div>
+        <div class="sf">p50; p90 is 4 days</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head rev">
+      <p class="eyebrow">The limits</p>
+      <h2>Independent, by design.</h2>
+    </div>
+    <div class="note rev">
+      <span class="wl">What it won't do</span>
+      <p>Meridian does not post entries to your ledger and does not approve anything. It reads, matches
+        and explains. If a break needs a judgement call, it hands you the two records and the rule that
+        disagreed — the decision stays yours, and so does the sign-off.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>Meridian &middot; built for controllers who get asked to show their work</footer>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+function fmt(n,d){return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function countUp(el){
+  const tg=parseFloat(el.dataset.count), d=parseInt(el.dataset.dec||'0'), su=el.dataset.suf||'';
+  if(reduce){ el.textContent=fmt(tg,d)+su; return; }
+  const t0=performance.now();
+  (function step(t){
+    const p=Math.min(1,(t-t0)/1000), e=1-Math.pow(1-p,3);
+    el.textContent=fmt(tg*e,d)+su;
+    if(p<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    e.target.classList.add('in');
+    e.target.querySelectorAll('[data-count]').forEach(countUp);
+    io.unobserve(e.target);
+  });
+},{threshold:.16});
+document.querySelectorAll('.rev').forEach(el=>io.observe(el));
+
+/* cursor spotlight — desktop, motion allowed, pauses in a background tab */
+if(!reduce && !matchMedia('(hover:none)').matches){
+  const spot=document.getElementById('spot');
+  let tx=innerWidth/2, ty=innerHeight/2, cx=tx, cy=ty, raf;
+  addEventListener('pointermove',e=>{ tx=e.clientX; ty=e.clientY; spot.style.opacity='1'; });
+  addEventListener('pointerleave',()=> spot.style.opacity='0');
+  function move(){
+    cx+=(tx-cx)*.1; cy+=(ty-cy)*.1;
+    spot.style.transform='translate('+cx+'px,'+cy+'px) translate(-50%,-50%)';
+    raf=requestAnimationFrame(move);
+  }
+  raf=requestAnimationFrame(move);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden) cancelAnimationFrame(raf);
+    else raf=requestAnimationFrame(move);
+  });
+}
+</script>
+
+</body>
+</html>

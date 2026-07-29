@@ -1,0 +1,7 @@
+{
+  "name": "site-craft",
+  "version": "1.0.0",
+  "description": "A design gate that actually runs. The method for building or fixing a website at shipped-product quality — ambient background layers, three-part depth, one motion grammar, concrete copy — plus a 31-rule linter with an optional headless-browser pass that exits non-zero until the page is genuinely finished. Zero required dependencies.",
+  "keywords": ["design", "frontend", "landing-page", "css", "linter", "accessibility", "tailwind", "anti-slop"],
+  "license": "MIT"
+}
