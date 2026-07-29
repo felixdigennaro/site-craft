@@ -100,9 +100,10 @@ Then:
 ```
 /site-craft build a landing page for <product>
 /site-craft audit ./src
+/site-craft reskin ./src — keep our colours, show me some options
 ```
 
-BUILD mode runs brief → direction lock → tokens → ambient → **copy** → depth → motion → gate → verify. AUDIT mode diagnoses first and ranks fixes by payoff-per-risk, because most sites that feel machine-made are fixed by the first three changes — restructuring them would be wasted work.
+BUILD mode runs brief → direction lock → tokens → ambient → **copy** → depth → motion → gate → verify. AUDIT mode diagnoses first and ranks fixes by payoff-per-risk, because most sites that feel machine-made are fixed by the first three changes — restructuring them would be wasted work. RESKIN mode extracts the existing palette and offers the four directions to choose from.
 
 Other agent tools (Cursor, Codex, Windsurf) read `skills/site-craft/SKILL.md` directly. Nothing is Claude-specific except the frontmatter.
 
@@ -124,10 +125,12 @@ Full instructions, plugin layout and CI wiring: **[INSTALL.md](INSTALL.md)**.
 
 | Path | What it is |
 |---|---|
-| `skills/site-craft/SKILL.md` | the workflow: 9 steps, fixed order, two modes |
+| `skills/site-craft/SKILL.md` | the workflow: 9 steps, fixed order, three modes |
 | `skills/site-craft/scripts/scaudit.mjs` | the gate, executable |
-| `skills/site-craft/tests/test_all.mjs` | 100 assertions (105 with `--live`) |
-| `skills/site-craft/examples/` | the before/after pair and both reports |
+| `skills/site-craft/scripts/scextract.mjs` | recover a token spine from an existing site |
+| `skills/site-craft/scripts/scvariants.mjs` | four starting templates from one palette |
+| `skills/site-craft/tests/test_all.mjs` | 146 assertions (151 with `--live`) |
+| `skills/site-craft/examples/` | the before/after pair, both reports, and the four generated directions |
 | `skills/site-craft/references/tokens.css` | token spine, glass, depth recipe, buttons |
 | `skills/site-craft/references/tokens-light.css` | the same spine for light grounds — the lit edge inverts |
 | `skills/site-craft/references/tailwind.md` | Tailwind v4 `@theme` port + React primitives |
@@ -136,6 +139,7 @@ Full instructions, plugin layout and CI wiring: **[INSTALL.md](INSTALL.md)**.
 | `skills/site-craft/references/copy.md` | hero formula, filters, banned phrasing |
 | `skills/site-craft/references/antislop.md` | the rules in prose, with the reasoning |
 | `skills/site-craft/references/audit.md` | fixing an existing site, ranked by payoff/risk |
+| `skills/site-craft/references/variants.md` | RESKIN mode — extraction rules and the four directions |
 | `commands/site-craft.md` | the `/site-craft` slash command |
 
 ---
@@ -143,7 +147,8 @@ Full instructions, plugin layout and CI wiring: **[INSTALL.md](INSTALL.md)**.
 ## Honest limits
 
 - The gate checks what a machine can check. Taste, hierarchy and whether the argument on the page is any good are still yours — 31 green lines mean the page isn't *broken*, not that it's *good*.
-- The hue-family rule reads hex literals. A palette written entirely in `oklch()` or generated at runtime by CSS-in-JS will be under-counted; check that one by eye.
+- Colour parsing covers hex, `rgb()`, `rgba()`, `hsl()`. A palette written entirely in `oklch()`/`lab()` is skipped by the hue-family rule and by the extractor's **static** pass — the live pass reads computed styles and is unaffected, so use `--live` on modern-colour codebases.
+- The extractor guesses which colour is your brand. On a static pass it sometimes picks the loudest colour rather than the logo's; the runners-up are printed and `--accent <hex>` overrides it.
 - The browser pass measures one page at a time. Point it at each route that matters.
 - Thresholds (≤3 hue families, ≤2 easing curves, ≥3 concrete figures) are defensible but were tuned against the bundled examples, not a large sample. **If a rule is wrong for your project, open an issue** — a documented exception is an answer, silently deleting the rule isn't.
 
