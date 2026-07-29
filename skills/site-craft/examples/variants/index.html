@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Meridian — pick a direction</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{color-scheme:light dark}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    background:#0d0f14;color:#e8ecf5;line-height:1.6;padding:40px 24px 80px}
+  .w{max-width:1240px;margin:0 auto}
+  h1{font-size:clamp(1.6rem,3vw,2.2rem);margin:0 0 8px;letter-spacing:-.03em;text-wrap:balance}
+  .sub{color:#9aa4bd;max-width:70ch;margin:0 0 8px;text-wrap:pretty}
+  .pal{display:flex;gap:0;margin:22px 0 36px;border-radius:10px;overflow:hidden;max-width:640px;
+    border:1px solid rgba(255,255,255,.12)}
+  .pal div{flex:1;height:52px;display:flex;align-items:flex-end;justify-content:center;
+    font-size:9px;letter-spacing:.06em;padding-bottom:5px;font-family:ui-monospace,monospace}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:26px}
+  .card{border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;background:#12151c}
+  .frame{height:420px;border:0;width:100%;display:block;background:#fff}
+  .meta{padding:18px 20px}
+  .meta h2{margin:0 0 6px;font-size:1.1rem;letter-spacing:-.02em}
+  .meta p{margin:0 0 10px;color:#9aa4bd;font-size:.9rem;text-wrap:pretty}
+  .fits{color:#7883a0;font-size:.82rem;margin:0 0 14px}
+  .links a{color:#8fb6ff;font-size:.85rem;text-decoration:none;margin-right:16px}
+  .links a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,monospace;font-size:.82rem;color:#8fb6ff}
+  footer{margin-top:48px;color:#7883a0;font-size:.85rem}
+</style></head><body><div class="w">
+<h1>Pick a starting direction</h1>
+<p class="sub">Same colour scheme in all four — extracted from your site, then disciplined to one accent family plus state colours. What differs is how surfaces are built, how depth is expressed, how dense the page is and how much it moves.</p>
+<div class="pal"><div style="background:#78a0ff;color:#020305">ground</div><div style="background:#020305;color:#ffffff">ink</div><div style="background:#1e283f;color:#ffffff">ink-soft</div><div style="background:#405172;color:#ffffff">accent</div><div style="background:#2f3c54;color:#ffffff">bright</div><div style="background:#202939;color:#ffffff">deep</div></div>
+<div class="grid">
+  <div class="card">
+    <iframe class="frame" src="ambient/index.html" title="Ambient preview" loading="lazy"></iframe>
+    <div class="meta">
+      <h2>Ambient</h2>
+      <p>Glass surfaces over a lit backdrop. Depth comes from glow rather than from shadow, and the page keeps moving quietly when nothing is happening.</p>
+      <p class="fits">Product, fintech, AI, anything that wants to read as engineered.</p>
+      <div class="links">
+        <a href="ambient/index.html" target="_blank">Open full page</a>
+        <a href="ambient/tokens.css" target="_blank">tokens.css</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <iframe class="frame" src="editorial/index.html" title="Editorial preview" loading="lazy"></iframe>
+    <div class="meta">
+      <h2>Editorial</h2>
+      <p>Flat, generous, typographic. No glass and almost no shadow — hierarchy is carried entirely by size, weight and whitespace.</p>
+      <p class="fits">Writing, research, studios, anything where the words are the product.</p>
+      <div class="links">
+        <a href="editorial/index.html" target="_blank">Open full page</a>
+        <a href="editorial/tokens.css" target="_blank">tokens.css</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <iframe class="frame" src="terminal/index.html" title="Terminal preview" loading="lazy"></iframe>
+    <div class="meta">
+      <h2>Terminal</h2>
+      <p>Dense, gridded, monospaced. Every number is a fixed-width figure and every label is a field name. Nothing floats; nothing blurs.</p>
+      <p class="fits">Dashboards, developer tools, anything where the data is the interface.</p>
+      <div class="links">
+        <a href="terminal/index.html" target="_blank">Open full page</a>
+        <a href="terminal/tokens.css" target="_blank">tokens.css</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <iframe class="frame" src="soft/index.html" title="Soft preview" loading="lazy"></iframe>
+    <div class="meta">
+      <h2>Soft</h2>
+      <p>Rounded, roomy, layered. Depth is built from stacked neutral shadows rather than glow, and everything moves gently.</p>
+      <p class="fits">Consumer apps, health, education — anywhere the page should feel approachable.</p>
+      <div class="links">
+        <a href="soft/index.html" target="_blank">Open full page</a>
+        <a href="soft/tokens.css" target="_blank">tokens.css</a>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>Pick one, copy its folder, replace the words. Then run
+<code>node scripts/scaudit.mjs &lt;folder&gt; --live &lt;url&gt;</code> — all four leave here green.</footer>
+</div></body></html>

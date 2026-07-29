@@ -16,7 +16,7 @@ Works as a Claude Code / Claude Agent skill. The linter runs standalone in any p
 git clone https://github.com/felixdigennaro/site-craft.git
 cd site-craft/skills/site-craft
 
-node tests/test_all.mjs                        # 100 assertions — ALL GREEN
+node tests/test_all.mjs                        # 146 assertions — ALL GREEN
 node scripts/scaudit.mjs examples/before.html  # GATE RED  — 20 failures
 node scripts/scaudit.mjs examples/after.html   # GATE GREEN — 27/31, 0 failures
 ```
@@ -24,6 +24,31 @@ node scripts/scaudit.mjs examples/after.html   # GATE GREEN — 27/31, 0 failure
 No dependencies. Node 18+.
 
 Then open `examples/before.html` and `examples/after.html` side by side. **Same product, same claims, same word count** — one reads as generated, the other doesn't. The audit reports for both are committed in `examples/out/` if you'd rather read the result than run anything.
+
+## Keep your colours, change everything else
+
+Already have a site? Extract its real palette and get four different starting templates from it — same colour scheme, genuinely different structure.
+
+```bash
+node scripts/scextract.mjs /path/to/src --live http://localhost:3000
+node scripts/scvariants.mjs site-craft.tokens.json -o ./variants --name "Acme"
+open variants/index.html
+```
+
+Committed example: **[`skills/site-craft/examples/variants/index.html`](skills/site-craft/examples/variants/index.html)** — all four side by side, no install needed.
+
+| | Ambient | Editorial | Terminal | Soft |
+|---|---|---|---|---|
+| Surfaces | glass | flat | gridded panels | opaque cards |
+| Depth | glow | hairlines | borders | stacked neutral shadows |
+| Radius | 16px | 4px | 2px | 24px |
+| Fits | product, fintech, AI | writing, research | dashboards, dev tools | consumer, health |
+
+The extractor assigns **roles**, not a colour list — ground by painted area, ink stops placed by contrast at least 1.25× apart, accent from the most chromatic colour on links and buttons — then reduces to one accent family plus state colours and **prints every hue family it dropped**. Override a wrong guess with `--accent <hex>`.
+
+All four directions clear the gate in both light and dark, and the test suite asserts it.
+
+---
 
 ## Point it at your own site
 
@@ -39,7 +64,7 @@ The four browser rules need Playwright. Without it they report `SKIP` **with the
 
 ```bash
 npm i -D playwright && npx playwright install chromium
-node tests/test_all.mjs --live                 # 105 assertions
+node tests/test_all.mjs --live                 # 151 assertions
 ```
 
 ---

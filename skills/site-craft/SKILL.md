@@ -1,6 +1,6 @@
 ---
 name: site-craft
-description: Build or fix a website/landing page at shipped-product quality — ambient background layers, real depth (not flat box-shadows), scroll-reveal motion, concrete copy, and a mandatory anti-AI-slop gate before delivery. Use for any new site, landing page, marketing surface, or hero/section rebuild, and for auditing or upgrading a site that already exists. Brand-agnostic: it encodes the method and the code recipes, not one palette.
+description: Build, restyle or fix a website/landing page at shipped-product quality — ambient background layers, real depth (not flat box-shadows), scroll-reveal motion, concrete copy, and a mandatory anti-AI-slop gate before delivery. Use for any new site, landing page, marketing surface, or hero/section rebuild; for auditing or upgrading a site that already exists; and when someone wants to keep their existing colour scheme but see several different style directions to choose from — it extracts the real palette from their site and generates four starting templates from it. Brand-agnostic: it encodes the method and the code recipes, not one palette.
 user-invocable: true
 ---
 
@@ -15,9 +15,19 @@ Method distilled from two shipped production surfaces — one standalone HTML/ca
 | Mode | Trigger | Entry point |
 |---|---|---|
 | **BUILD** | new site, new landing, new section | step 1 below |
-| **AUDIT** | "sistema questo sito", "migliora la home", existing codebase | `references/audit.md`, then re-enter at step 3 |
+| **AUDIT** | "fix this site", "improve the home page", existing codebase | `references/audit.md`, then re-enter at step 3 |
+| **RESKIN** | "keep our colours, change the look", "give me some options" | `references/variants.md` — extract the palette, generate four directions, let the user pick, then continue at step 4 |
 
 In AUDIT mode you never rewrite from scratch. You diagnose against the same rubric, then apply the smallest set of changes that moves each failing axis.
+
+In RESKIN mode you never invent a palette. Run the extractor against the real site, show the user the four directions, and **let them choose** — the direction is a taste decision and it is theirs:
+
+```bash
+node scripts/scextract.mjs ./src --live http://localhost:3000
+node scripts/scvariants.mjs site-craft.tokens.json -o ./variants --name "Acme"
+```
+
+Then open `variants/index.html`, show it, and build on whichever they pick. If the extractor guessed the brand colour wrong, re-run with `--accent <hex>` rather than hand-editing the output.
 
 ---
 
@@ -165,6 +175,9 @@ Plus the gate result: which anti-slop lines pass, which don't and why.
 | `references/copy.md` | step 5 — voice, banned phrasing, before/after rewrites |
 | `references/antislop.md` | step 8 — the rules in prose, with reasoning |
 | `references/audit.md` | AUDIT mode — diagnose an existing site |
+| `references/variants.md` | RESKIN mode — extract a palette, generate four directions |
+| `scripts/scextract.mjs` | RESKIN step 1 — recover a disciplined token spine |
+| `scripts/scvariants.mjs` | RESKIN step 2 — four starting templates from one palette |
 | `scripts/scaudit.mjs` | step 8 — the gate, executable |
 | `examples/after.html` | any step — a complete page that clears all 31 rules; copy from it |
 | `examples/before.html` | step 8 — what each rule is protecting against, made concrete |

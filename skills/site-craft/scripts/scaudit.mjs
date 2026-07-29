@@ -153,12 +153,38 @@ function hexToHsl(hex) {
   return { h: hue, s, l };
 }
 
-/** Distinct chromatic hue families (30° bins), ignoring near-neutrals. */
+const STATE_TOKEN = /--(?:pos|positive|success|ok|warn|warning|caution|neg|negative|error|danger|destructive|info|notice)[\w-]*$/i;
+const STATE_SEL = /\.(?:pos|positive|success|ok|warn|warning|neg|negative|error|danger|destructive|info)\b/i;
+
+/** Colours bound to a semantic state role. Green-for-good and red-for-bad are
+ *  conventions, not decoration: counting them as extra "brand hues" penalises
+ *  every design system that owns a complete state palette, which is the
+ *  opposite of what the one-accent rule is protecting. */
+function stateColors(files) {
+  const set = new Set();
+  for (const f of files) {
+    const css = styleText(f);
+    for (const m of css.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+)/g)) {
+      if (!STATE_TOKEN.test(m[1])) continue;
+      for (const h of m[2].match(/#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g) || []) set.add(h.toLowerCase());
+    }
+    for (const r of cssRules(css)) {
+      if (!STATE_SEL.test(r.sel)) continue;
+      for (const h of r.body.match(/#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g) || []) set.add(h.toLowerCase());
+    }
+  }
+  return set;
+}
+
+/** Distinct chromatic hue families (30° bins), ignoring near-neutrals and
+ *  colours bound to a state role. */
 function hueFamilies(files) {
+  const state = stateColors(files);
   const bins = new Set();
   const sample = new Map();
   for (const f of files) {
     for (const m of styleText(f).matchAll(/#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g)) {
+      if (state.has(m[0].toLowerCase())) continue;
       const hsl = hexToHsl(m[0]);
       if (!hsl) continue;
       if (hsl.s < 0.22) continue;              // grey / near-grey → not a hue
@@ -168,7 +194,7 @@ function hueFamilies(files) {
       if (!sample.has(bin)) sample.set(bin, m[0]);
     }
   }
-  return { count: bins.size, samples: [...sample.values()] };
+  return { count: bins.size, samples: [...sample.values()], stateExcluded: state.size };
 }
 
 /* ─────────────────────────── rules ─────────────────────────── */
@@ -199,10 +225,18 @@ const rules = [
   {
     id: 'A3', line: 'No default flat shadows',
     run: ({ files }) => {
+      // A framework default is a shadow that is ONE flat layer. The same
+      // offsets appearing as the contact layer of a composed stack
+      // (`inset …, 0 1px 2px …, 0 24px 48px -20px …`) are correct craft —
+      // flagging those punishes exactly the depth model this skill teaches.
+      const decls = scan(files, /box-shadow\s*:[^;{}]+/gi);
+      const flat = decls.filter((d) => {
+        const ls = layers(d.text.replace(/^[^:]*:/, ''));
+        if (ls.length > 1) return false;                    // composed → not a default
+        return /\b0 4px 6px|\b0 2px 4px|rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0?\.1\s*\)/i.test(ls[0] || '');
+      });
       const hits = dedupe([
-        ...scan(files, /box-shadow\s*:[^;{}]*\b0 4px 6px[^;{}]*/gi),
-        ...scan(files, /box-shadow\s*:[^;{}]*\b0 2px 4px[^;{}]*/gi),
-        ...scan(files, /box-shadow\s*:[^;{}]*rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0?\.1\s*\)[^;{}]*/gi),
+        ...flat,
         ...scan(files, /(?:^|["'\s])shadow-(?:sm|md|lg|xl|2xl)(?=["'\s]|$)/g, (f) => f.text),
       ]);
       return hits.length
@@ -218,11 +252,26 @@ const rules = [
       const decls = scan(files, /box-shadow\s*:[^;{}]+/gi);
       const amb = [];
       for (const d of decls) {
-        for (const l of layers(d.text.replace(/^[^:]*:/, ''))) {
-          if (!/inset/i.test(l) && !/^\s*(none|0)\s*$/i.test(l)) amb.push({ ...d, text: l });
-        }
+        // Per declaration, the AMBIENT layer is the non-inset one with the
+        // largest blur. A tight contact layer (`0 1px 2px`) is meant to sit
+        // flush and correctly has no spread — only the long throw needs one.
+        const cand = layers(d.text.replace(/^[^:]*:/, ''))
+          .filter((l) => !/inset/i.test(l) && !/^\s*(none|0)\s*$/i.test(l))
+          .map((l) => {
+            // Strip colour/var functions first, then read positionally:
+            // offset-x, offset-y, blur, spread. A unitless `0` offset carries
+            // no px suffix, so requiring one shifts every index by one and reads the
+            // spread as the blur.
+            const n = (l.replace(/\b(?:rgba?|hsla?|var|color|oklch|lab)\([^)]*\)/gi, ' ')
+                        .match(/-?\d*\.?\d+/g) || []).map(Number);
+            return { text: l, blur: n.length >= 3 ? Math.abs(n[2]) : 0 };
+          })
+          .filter((l) => l.blur > 8);
+        if (!cand.length) continue;
+        cand.sort((a, b) => b.blur - a.blur);
+        amb.push({ ...d, text: cand[0].text });
       }
-      if (!amb.length) return { status: 'skip', detail: 'no ambient (non-inset) shadow layers' };
+      if (!amb.length) return { status: 'skip', detail: 'no long ambient shadow layers' };
       const bad = amb.filter((h) => !/\s-\d+(\.\d+)?(px|rem)/.test(h.text));
       return bad.length
         ? { status: 'warn', detail: `${bad.length}/${amb.length} ambient shadow layer(s) with no negative spread`, hits: bad.slice(0, 5) }
@@ -256,11 +305,12 @@ const rules = [
   {
     id: 'B7', line: 'One accent hue family (≤3 chromatic families)',
     run: ({ files }) => {
-      const { count, samples } = hueFamilies(files);
-      if (count === 0) return { status: 'skip', detail: 'no chromatic colours found' };
+      const { count, samples, stateExcluded } = hueFamilies(files);
+      const note = stateExcluded ? ` (${stateExcluded} state colour(s) excluded)` : '';
+      if (count === 0) return { status: 'skip', detail: 'no chromatic colours found' + note };
       return count <= 3
-        ? { status: 'pass', detail: `${count} hue famil${count === 1 ? 'y' : 'ies'}: ${samples.join(' ')}` }
-        : { status: 'fail', detail: `${count} hue families: ${samples.join(' ')} — more than accent + state` };
+        ? { status: 'pass', detail: `${count} decorative hue famil${count === 1 ? 'y' : 'ies'}: ${samples.join(' ')}${note}` }
+        : { status: 'fail', detail: `${count} decorative hue families: ${samples.join(' ')}${note} — a third is rarely a decision` };
     },
   },
   {
@@ -374,11 +424,18 @@ const rules = [
   {
     id: 'E27', line: 'rAF loops cancel on visibilitychange',
     run: ({ files }) => {
-      const raf = scan(files, /requestAnimationFrame/g, (f) => f.text).length;
-      if (!raf) return { status: 'skip', detail: 'no rAF loops' };
+      // Only a PERPETUAL loop burns cycles in a background tab. A count-up
+      // that recurses behind `if (p < 1)` terminates on its own, and demanding
+      // a visibility guard for it is noise.
+      const all = scan(files, /.*requestAnimationFrame\s*\(.*/g, (f) => f.text);
+      if (!all.length) return { status: 'skip', detail: 'no rAF calls' };
+      const perpetual = all.filter((h) => !/\b(if|while|\?|&&)\b|\?/.test(h.text.split('requestAnimationFrame')[0]));
+      if (!perpetual.length) {
+        return { status: 'pass', detail: `${all.length} rAF call(s), all guarded by a terminating condition` };
+      }
       const vis = scan(files, /visibilitychange/g, (f) => f.text).length;
-      return vis ? { status: 'pass', detail: `${raf} rAF call(s), visibility handled` }
-                 : { status: 'warn', detail: 'rAF loops never pause in a background tab' };
+      return vis ? { status: 'pass', detail: `${perpetual.length} perpetual rAF loop(s), visibility handled` }
+                 : { status: 'warn', detail: `${perpetual.length} perpetual rAF loop(s) never pause in a background tab`, hits: perpetual.slice(0, 3) };
     },
   },
   {

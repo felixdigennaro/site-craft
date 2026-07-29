@@ -211,6 +211,132 @@ if (process.argv.includes('--live')) {
   }
 }
 
+/* ══════════════════════════ 7 · extraction ══════════════════════════ */
+
+const { parseColor, toHsl, contrast: xcontrast, assignRoles, hex: xhex } =
+  await import('../scripts/scextract.mjs');
+
+ok('parseColor reads 6-digit hex', (() => { const c = parseColor('#4d8dff'); return c.r === 77 && c.g === 141 && c.b === 255; })());
+ok('parseColor expands 3-digit hex', (() => { const c = parseColor('#f00'); return c.r === 255 && c.g === 0 && c.b === 0; })());
+ok('parseColor reads rgb()', (() => { const c = parseColor('rgb(10, 20, 30)'); return c.r === 10 && c.b === 30 && c.a === 1; })());
+ok('parseColor reads rgba() alpha', parseColor('rgba(0,0,0,0.5)').a === 0.5);
+ok('parseColor reads hsl()', (() => { const c = parseColor('hsl(0, 100%, 50%)'); return c.r === 255 && c.g === 0; })());
+ok('parseColor treats transparent as alpha 0', parseColor('transparent').a === 0);
+ok('parseColor returns null for oklch (documented limit)', parseColor('oklch(0.7 0.18 160)') === null);
+ok('parseColor returns null for nonsense', parseColor('banana') === null);
+
+ok('contrast white-on-black is 21:1', Math.round(xcontrast({ r: 255, g: 255, b: 255 }, { r: 0, g: 0, b: 0 })) === 21);
+ok('contrast is symmetric',
+   xcontrast({ r: 20, g: 30, b: 40 }, { r: 200, g: 210, b: 220 }) === xcontrast({ r: 200, g: 210, b: 220 }, { r: 20, g: 30, b: 40 }));
+ok('contrast of a colour with itself is 1', xcontrast({ r: 77, g: 141, b: 255 }, { r: 77, g: 141, b: 255 }) === 1);
+
+/** Synthetic observations: a light page with a purple brand and stray hues. */
+const obsLight = [
+  { c: parseColor('#ffffff'), kind: 'bg', weight: 900000, sel: 'body' },
+  { c: parseColor('#f4f5f8'), kind: 'bg', weight: 40000, sel: '.card' },
+  { c: parseColor('#6d28d9'), kind: 'accent', weight: 4000, sel: 'a' },
+  { c: parseColor('#111111'), kind: 'ink', weight: 4096, sel: 'h1' },
+  { c: parseColor('#5a5a5a'), kind: 'ink', weight: 400, sel: 'p' },
+  { c: parseColor('#ec4899'), kind: 'ink', weight: 120, sel: '.tag' },
+  { c: parseColor('#f59e0b'), kind: 'other', weight: 80, sel: '.badge' },
+];
+const rolesL = assignRoles(obsLight);
+
+ok('extract detects light polarity', rolesL.polarity === 'light');
+ok('extract takes the most-painted background as the ground', rolesL.color.ground === '#ffffff');
+ok('extract picks a near-neutral second surface, not a brand fill',
+   toHsl(parseColor(rolesL.color.ground2)).s < 0.3, rolesL.color.ground2);
+ok('extract finds the brand accent', rolesL.color.accent.toLowerCase() === '#6d28d9', rolesL.color.accent);
+ok('extract reports the hue families it dropped', rolesL.dropped.length >= 2, JSON.stringify(rolesL.dropped));
+
+const ramp = ['ink', 'inkSoft', 'inkFaint'].map((k) => xcontrast(parseColor(rolesL.color[k]), parseColor(rolesL.color.ground)));
+ok('ink ramp is strictly descending', ramp[0] > ramp[1] && ramp[1] > ramp[2], ramp.join(' > '));
+ok('ink ramp stops are at least 1.25x apart',
+   ramp[0] / ramp[1] >= 1.24 && ramp[1] / ramp[2] >= 1.24, ramp.map((x) => x.toFixed(2)).join(' '));
+ok('primary ink clears WCAG AA on the ground', ramp[0] >= 4.5, ramp[0].toFixed(2));
+ok('on-accent text is readable', xcontrast(parseColor(rolesL.color.inkInvert), parseColor(rolesL.color.accent)) >= 4.5);
+ok('accent clears 3:1 against the ground', rolesL.contrast.accentOnGround >= 3);
+
+ok('--accent overrides the heuristic',
+   assignRoles(obsLight, { accent: '#0f766e' }).color.accent.toLowerCase() === '#0f766e');
+
+const obsDark = [
+  { c: parseColor('#06080f'), kind: 'bg', weight: 900000, sel: 'body' },
+  { c: parseColor('#4d8dff'), kind: 'accent', weight: 4000, sel: 'a' },
+  { c: parseColor('#e8ecf5'), kind: 'ink', weight: 4096, sel: 'h1' },
+];
+const rolesD = assignRoles(obsDark);
+ok('extract detects dark polarity', rolesD.polarity === 'dark');
+ok('dark ink ramp also clears AA',
+   xcontrast(parseColor(rolesD.color.ink), parseColor(rolesD.color.ground)) >= 4.5);
+
+/* State hues stay conventional, and move only on a real collision. */
+const greenBrand = assignRoles([
+  { c: parseColor('#ffffff'), kind: 'bg', weight: 900000, sel: 'body' },
+  { c: parseColor('#10b981'), kind: 'accent', weight: 4000, sel: 'a' },
+  { c: parseColor('#111111'), kind: 'ink', weight: 4096, sel: 'h1' },
+]);
+ok('a red "negative" stays red when the brand is green',
+   (() => { const h = toHsl(parseColor(greenBrand.color.neg)).h; return h < 40 || h > 330; })(),
+   `hue ${Math.round(toHsl(parseColor(greenBrand.color.neg)).h)}°`);
+ok('"positive" moves off the accent when the brand is green',
+   Math.abs(toHsl(parseColor(greenBrand.color.pos)).h - toHsl(parseColor(greenBrand.color.accent)).h) > 25);
+ok('the positive/accent collision is reported',
+   greenBrand.notes.some((n) => /positive/i.test(n)));
+
+/* ══════════════════════════ 8 · variants clear their own gate ══════════════════════════ */
+
+const { DIRECTIONS, page: vpage } = await import('../scripts/scvariants.mjs');
+
+ok('four directions are shipped', DIRECTIONS.length === 4);
+ok('direction ids are unique', new Set(DIRECTIONS.map((d) => d.id)).size === DIRECTIONS.length);
+
+for (const tok of [{ label: 'light', t: rolesL }, { label: 'dark', t: rolesD }]) {
+  for (const d of DIRECTIONS) {
+    const corpus = [
+      { file: `${d.id}/tokens.css`, text: d.css(tok.t) },
+      { file: `${d.id}/index.html`, text: vpage(tok.t, d, 'Testbrand') },
+    ];
+    const res = auditFiles(corpus);
+    const bad = res.filter((r) => r.status === 'fail' || r.status === 'warn');
+    ok(`variant "${d.id}" (${tok.label}) clears the gate`, bad.length === 0,
+       bad.map((r) => `${r.id}: ${r.detail}`).join(' | '));
+  }
+}
+
+/* The directions must be genuinely different, not one palette in four hats. */
+const shapes = DIRECTIONS.map((d) => {
+  const css = d.css(rolesL);
+  return {
+    id: d.id,
+    radius: (css.match(/--radius:\s*(\d+)px/) || [])[1],
+    glass: /backdrop-filter/.test(css),
+    halos: /\.halo/.test(css),
+  };
+});
+ok('the four directions use four different radii',
+   new Set(shapes.map((s) => s.radius)).size === 4, shapes.map((s) => `${s.id}:${s.radius}`).join(' '));
+ok('only some directions use glass', new Set(shapes.map((s) => s.glass)).size === 2);
+ok('only some directions use halos', new Set(shapes.map((s) => s.halos)).size === 2);
+
+/* B7 must not punish a complete state palette. */
+ok('B7 excludes state-bound colours from the family count',
+   statusOf('B7', f(':root{--accent:#4d8dff;--pos:#10b981;--warn:#e8c15a;--neg:#f2795f}')) === 'pass');
+ok('B7 still fails on decorative extra hues',
+   statusOf('B7', f(':root{--a:#4d8dff;--b:#10b981;--c:#e8c15a;--d:#f2795f}')) === 'fail');
+
+/* A3 must not punish a contact layer inside a composed stack. */
+ok('A3 accepts a tight contact layer inside a multi-layer shadow',
+   statusOf('A3', f('.c{box-shadow:inset 0 1px 0 #fff, 0 2px 4px rgba(1,2,3,.1), 0 24px 48px -20px rgba(1,2,3,.3)}')) === 'pass');
+ok('A3 still fails on a lone default shadow',
+   statusOf('A3', f('.c{box-shadow:0 2px 4px rgba(0,0,0,0.1)}')) === 'fail');
+
+/* E27 must not punish a one-shot rAF. */
+ok('E27 accepts a rAF guarded by a terminating condition',
+   statusOf('E27', f('<script>function s(t){if(p<1) requestAnimationFrame(s)}</script>')) === 'pass');
+ok('E27 still warns on a perpetual loop',
+   statusOf('E27', f('<script>function m(){raf=requestAnimationFrame(m)}m()</script>')) === 'warn');
+
 /* ══════════════════════════ report ══════════════════════════ */
 
 const total = pass + fail;

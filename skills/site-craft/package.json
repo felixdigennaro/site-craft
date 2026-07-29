@@ -1,18 +1,37 @@
 {
   "name": "site-craft",
-  "version": "1.0.0",
-  "description": "A design gate that actually runs — 31 rules, static + headless browser pass.",
+  "version": "1.1.0",
+  "description": "A design gate that actually runs \u2014 31 rules, static + headless browser pass.",
   "license": "MIT",
   "type": "module",
-  "bin": { "scaudit": "./scripts/scaudit.mjs" },
+  "bin": {
+    "scaudit": "./scripts/scaudit.mjs",
+    "scextract": "./scripts/scextract.mjs",
+    "scvariants": "./scripts/scvariants.mjs"
+  },
   "scripts": {
     "test": "node tests/test_all.mjs",
     "test:live": "node tests/test_all.mjs --live",
     "gate": "node scripts/scaudit.mjs",
-    "demo": "node scripts/scaudit.mjs examples/before.html && node scripts/scaudit.mjs examples/after.html"
+    "demo": "node scripts/scaudit.mjs examples/before.html && node scripts/scaudit.mjs examples/after.html",
+    "extract": "node scripts/scextract.mjs",
+    "variants": "node scripts/scvariants.mjs"
   },
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "optionalDependencies": {},
-  "devDependencies": { "playwright": "^1.40.0" },
-  "files": ["SKILL.md", "README.md", "LICENSE", "CHANGELOG.md", "scripts/", "references/", "examples/", "tests/"]
+  "devDependencies": {
+    "playwright": "^1.40.0"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "scripts/",
+    "references/",
+    "examples/",
+    "tests/"
+  ]
 }

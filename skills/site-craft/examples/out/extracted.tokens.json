@@ -1,0 +1,46 @@
+{
+  "source": "live: examples/after.html",
+  "generated": "site-craft extract",
+  "polarity": "light",
+  "color": {
+    "ground": "#78a0ff",
+    "ground2": "#749af6",
+    "panel": "rgba(12,18,46,0.025)",
+    "panel2": "rgba(12,18,46,0.05)",
+    "hair": "rgba(12,18,46,0.1)",
+    "hairStrong": "rgba(12,18,46,0.18)",
+    "ink": "#020305",
+    "inkSoft": "#1e283f",
+    "inkFaint": "#2b395b",
+    "inkInvert": "#ffffff",
+    "accent": "#405172",
+    "accentBright": "#2f3c54",
+    "accentDeep": "#202939",
+    "accentGlow": "rgba(64,81,114,0.16)",
+    "pos": "#278663",
+    "warn": "#957823",
+    "neg": "#b43b22"
+  },
+  "type": {
+    "sans": "-apple-system,BlinkMacSystemFont,\"Segoe UI\",system-ui,Helvetica,Arial,sans-serif",
+    "display": "-apple-system,\"Segoe UI\",system-ui,sans-serif",
+    "mono": "ui-monospace,SFMono-Regular,\"SF Mono\",Menlo,monospace"
+  },
+  "contrast": {
+    "inkOnGround": 8.13,
+    "inkSoftOnGround": 5.8,
+    "inkFaintOnGround": 4.49,
+    "accentOnGround": 3.12,
+    "inkInvertOnAccent": 7.92
+  },
+  "dropped": [
+    "30-60°"
+  ],
+  "notes": [
+    "ground #78a0ff → light polarity",
+    "no near-neutral second surface found — derived ground-2 from ground",
+    "accent #8fb6ff (hue 219°) taken as the brand",
+    "accent lightened/darkened 13 step(s) to clear 3:1 against the ground",
+    "dropped 1 other hue family (30-60°) — the spine keeps one accent plus state colours"
+  ]
+}

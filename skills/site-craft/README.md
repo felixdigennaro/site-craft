@@ -11,7 +11,7 @@ Works as a Claude Code / Claude Agent skill. The linter runs standalone in any p
 ## Quickstart (30 seconds, no dependencies)
 
 ```bash
-node tests/test_all.mjs                                  # 100 assertions — ALL GREEN
+node tests/test_all.mjs                                  # 146 assertions — ALL GREEN
 node scripts/scaudit.mjs examples/before.html            # a deliberately generic page → GATE RED
 node scripts/scaudit.mjs examples/after.html             # same content, method applied → GATE GREEN
 ```
@@ -30,10 +30,41 @@ The browser pass needs Playwright and says so plainly when it's missing, rather 
 
 ```bash
 npm i -D playwright && npx playwright install chromium
-node tests/test_all.mjs --live                           # 105 assertions
+node tests/test_all.mjs --live                           # 151 assertions
 ```
 
 Exit code is `0` when clean and `1` on any failure, so it drops into CI as-is.
+
+---
+
+## Keep your colours, change everything else
+
+When a site already exists and the brand colours are not up for debate, the extractor recovers a disciplined token spine from the real page, and the generator turns it into four genuinely different starting templates.
+
+```bash
+node scripts/scextract.mjs ./src --live http://localhost:3000
+node scripts/scvariants.mjs site-craft.tokens.json -o ./variants --name "Acme"
+open variants/index.html
+```
+
+A committed example is in `examples/variants/` — open `examples/variants/index.html` to see all four side by side without running anything.
+
+The extractor assigns **roles**, not a colour list: the most-painted background becomes the ground, text colours are placed by contrast with each stop at least 1.25× apart, the most chromatic colour on links and buttons becomes the accent, and state colours stay conventional. Then it imposes discipline — one accent family plus state — and **prints every hue family it dropped** so you can argue with it:
+
+```
+· accent #6d28d9 (hue 263°) taken as the brand — runners-up #10b981, #ec4899;
+  override with --accent <hex> if this is wrong
+· dropped 3 other hue families (30-60°, 240-270°, 210-240°)
+```
+
+| | Ambient | Editorial | Terminal | Soft |
+|---|---|---|---|---|
+| Surfaces | glass | flat | gridded panels | opaque cards |
+| Depth | glow | hairlines | borders | stacked neutral shadows |
+| Radius | 16px | 4px | 2px | 24px |
+| Fits | product, fintech, AI | writing, research | dashboards, dev tools | consumer, health |
+
+All four clear the gate in both polarities, and the test suite asserts it — a tool that shipped templates failing its own linter would deserve to be ignored. Details and the extraction rules: **`references/variants.md`**.
 
 ---
 
@@ -61,10 +92,13 @@ The four browser-pass rules are the ones that matter most and the ones a screens
 |---|---|
 | `SKILL.md` | the workflow: 9 steps in a fixed order, two modes (build / audit) |
 | `scripts/scaudit.mjs` | the gate, executable. Static + optional browser pass |
-| `tests/test_all.mjs` | 100 assertions (105 with `--live`) |
+| `scripts/scextract.mjs` | recover a disciplined token spine from an existing site |
+| `scripts/scvariants.mjs` | four starting templates from one colour scheme |
+| `tests/test_all.mjs` | 146 assertions (151 with `--live`) |
 | `examples/before.html` | a competent-looking generic page — GATE RED, 22 failures with `--live` |
 | `examples/after.html` | same content, method applied — GATE GREEN, 31/31 with `--live` |
-| `examples/out/` | both audit reports, text and JSON |
+| `examples/out/` | both audit reports, text and JSON, plus the extracted tokens |
+| `examples/variants/` | the four directions, generated and committed |
 | `references/tokens.css` | the token spine, glass, the three-part depth recipe, buttons |
 | `references/tokens-light.css` | the same spine for light grounds — the lit edge inverts |
 | `references/tailwind.md` | Tailwind v4 `@theme` port + React primitives |
@@ -73,6 +107,7 @@ The four browser-pass rules are the ones that matter most and the ones a screens
 | `references/copy.md` | hero formula, five filters, banned phrasing, rewrites |
 | `references/antislop.md` | the checklist behind the linter, with the reasoning |
 | `references/audit.md` | fixing a site that already exists, ranked by payoff/risk |
+| `references/variants.md` | RESKIN mode — extraction rules and the four directions |
 
 ---
 
